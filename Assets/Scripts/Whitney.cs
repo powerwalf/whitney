@@ -36,6 +36,9 @@ public class Whitney : UdonSharpBehaviour
     [SerializeField] protected bool m_rotateX = false;
     [SerializeField] protected bool m_rotateY = false;
     [SerializeField] protected bool m_rotateZ = false;
+    [SerializeField] [Range(0f, 360f)] protected float m_rotationX = 0.0f;
+    [SerializeField] [Range(0f, 360f)] protected float m_rotationY = 0.0f;
+    [SerializeField] [Range(0f, 360f)] protected float m_rotationZ = 0.0f;
 
     [Header("UI Control Refs")]
     [SerializeField] protected Slider m_numberOfObjectsSlider;
@@ -51,6 +54,10 @@ public class Whitney : UdonSharpBehaviour
     [SerializeField] protected Slider m_colorSaturationSlider;
     [SerializeField] protected Slider m_colorBrightnessSlider;
     [SerializeField] protected Slider m_colorAlphaSlider;
+
+    [SerializeField] protected Slider m_rotationOffsetXSlider;
+    [SerializeField] protected Slider m_rotationOffsetYSlider;
+    [SerializeField] protected Slider m_rotationOffsetZSlider;
 
     [SerializeField] protected Toggle m_harmonicScaleToggle;
     [SerializeField] protected Toggle m_rotateXToggle;
@@ -80,6 +87,10 @@ public class Whitney : UdonSharpBehaviour
         m_xScaleSlider.value = m_baseScaleX;
         m_yScaleSlider.value = m_baseScaleY;
         m_zScaleSlider.value = m_baseScaleZ;
+
+        m_rotationOffsetXSlider.value = m_rotationX;
+        m_rotationOffsetYSlider.value = m_rotationY;
+        m_rotationOffsetZSlider.value = m_rotationZ;
 
         m_rotateXToggle.isOn = m_rotateX;
         m_rotateYToggle.isOn = m_rotateY;
@@ -126,10 +137,10 @@ public class Whitney : UdonSharpBehaviour
                 m_objects[i].transform.localScale = baseScale;
 			}
 
-            // rotation
-            Quaternion rotation = Quaternion.Euler(m_rotateX ? scaledPhase % 360f : 0f,
-                m_rotateY ? scaledPhase % 360f : 0f,
-                m_rotateZ ? scaledPhase % 360f : 0f);
+            // rotation (probably dont need to modulo)
+            Quaternion rotation = Quaternion.Euler(m_rotateX ? (scaledPhase * 360f + m_rotationX) % 360f : m_rotationX,
+                m_rotateY ? (scaledPhase * 360f + m_rotationY) % 360f : m_rotationY,
+                m_rotateZ ? (scaledPhase * 360f + m_rotationZ) % 360f : m_rotationZ);
             m_objects[i].transform.rotation = rotation;
 		}
 
@@ -191,6 +202,21 @@ public class Whitney : UdonSharpBehaviour
 	{
         m_colorHueSpeed = m_colorHueSpeedSlider.value;
 	}
+
+    public void OnRotationOffsetXSliderChanged()
+	{
+        m_rotationX = m_rotationOffsetXSlider.value;
+	}        
+
+    public void OnRotationOffsetYSliderChanged()
+	{
+        m_rotationY = m_rotationOffsetYSlider.value;
+	}        
+
+    public void OnRotationOffsetZSliderChanged()
+	{
+        m_rotationZ = m_rotationOffsetZSlider.value;
+	}        
 #endregion
 
 #region Toggle Functions
