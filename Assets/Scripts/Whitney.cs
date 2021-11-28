@@ -67,6 +67,7 @@ public class Whitney : UdonSharpBehaviour
             m_objects[i] = VRCInstantiate(m_objectPrefab);
             m_objects[i].transform.SetParent(this.transform);
             m_objects[i].SetActive(false);
+            m_objects[i].GetComponent<Renderer>().sortingOrder = i;
         }
 
         m_circleSizeSlider.value = m_circleSize;
@@ -82,9 +83,9 @@ public class Whitney : UdonSharpBehaviour
         m_rotateYToggle.isOn = m_rotateY;
         m_rotateZToggle.isOn = m_rotateZ;
 
-        //m_colorSaturationSlider.value = m_colorSaturation;
-        //m_colorBrightnessSlider.value = m_colorBrightness;
-        //m_colorAlphaSlider.value = m_colorAlpha;
+        m_colorSaturationSlider.value = m_colorSaturation;
+        m_colorBrightnessSlider.value = m_colorBrightness;
+        m_colorAlphaSlider.value = m_colorAlpha;
     }
   
 	private void Update()
@@ -123,10 +124,10 @@ public class Whitney : UdonSharpBehaviour
 			}
 
             // rotation
-            Vector3 rotation = new Vector3(m_rotateX ? scaledPhase : 0f,
-                m_rotateY ? scaledPhase : 0f,
-                m_rotateZ ? scaledPhase : 0f);
-            m_objects[i].transform.localEulerAngles = rotation;
+            Quaternion rotation = Quaternion.Euler(m_rotateX ? scaledPhase % 360f : 0f,
+                m_rotateY ? scaledPhase % 360f : 0f,
+                m_rotateZ ? scaledPhase % 360f : 0f);
+            m_objects[i].transform.rotation = rotation;
 		}
 
         m_phase += Time.deltaTime * m_speedScaler;
@@ -167,6 +168,21 @@ public class Whitney : UdonSharpBehaviour
 	{
         m_baseScaleZ = m_zScaleSlider.value;
 	}
+
+    public void OnColorSaturationSliderChanged()
+	{
+        m_colorSaturation = m_colorSaturationSlider.value;
+	}
+
+    public void OnColorBrightnessSliderChanged()
+	{
+        m_colorBrightness = m_colorBrightnessSlider.value;
+	}
+
+    public void OnColorAlphaSliderChanged()
+	{
+        m_colorAlpha = m_colorAlphaSlider.value;
+	}
 #endregion
 
 #region Toggle Functions
@@ -190,5 +206,6 @@ public class Whitney : UdonSharpBehaviour
         m_rotateZ = m_rotateZToggle.isOn;
 	}
 #endregion
+
 }
 
