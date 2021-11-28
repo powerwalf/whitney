@@ -27,6 +27,7 @@ public class Whitney : UdonSharpBehaviour
     [SerializeField] [Range(0.1f, 1f)] protected float m_baseScaleZ = 1.0f;
 
     [Header("Color")]
+    [SerializeField] [Range(0.001f, 1f)] protected float m_colorHueSpeed = 1f;
     [SerializeField] [Range(0f, 1f)] protected float m_colorSaturation = 0.7f;
     [SerializeField] [Range(0f, 1f)] protected float m_colorBrightness = 0.7f;
     [SerializeField] [Range(0f, 1f)] protected float m_colorAlpha = 0.7f;
@@ -46,6 +47,7 @@ public class Whitney : UdonSharpBehaviour
     [SerializeField] protected Slider m_yScaleSlider;
     [SerializeField] protected Slider m_zScaleSlider;
 
+    [SerializeField] protected Slider m_colorHueSpeedSlider;
     [SerializeField] protected Slider m_colorSaturationSlider;
     [SerializeField] protected Slider m_colorBrightnessSlider;
     [SerializeField] protected Slider m_colorAlphaSlider;
@@ -83,6 +85,7 @@ public class Whitney : UdonSharpBehaviour
         m_rotateYToggle.isOn = m_rotateY;
         m_rotateZToggle.isOn = m_rotateZ;
 
+        m_colorHueSpeedSlider.value = m_colorHueSpeed;
         m_colorSaturationSlider.value = m_colorSaturation;
         m_colorBrightnessSlider.value = m_colorBrightness;
         m_colorAlphaSlider.value = m_colorAlpha;
@@ -102,13 +105,13 @@ public class Whitney : UdonSharpBehaviour
 
             m_objects[i].SetActive(true);
 
-            float scaledPhase = m_phase * i;
+            float scaledPhase = m_phase * (i + 1);  // add 1 so there arent any objects that arent moving
 
             // position
             m_objects[i].transform.position  = new Vector3(Mathf.Cos(scaledPhase) * m_circleSize, Mathf.Sin(scaledPhase) * m_circleSize, 0.0f) + this.transform.position;
 
             // color
-            Color color = Color.HSVToRGB(scaledPhase % 1.0f, m_colorSaturation, m_colorBrightness);
+            Color color = Color.HSVToRGB(scaledPhase * m_colorHueSpeed % 1.0f, m_colorSaturation, m_colorBrightness);
             color.a = m_colorAlpha;
             m_objects[i].GetComponent<Renderer>().material.color = color;
 
@@ -130,7 +133,7 @@ public class Whitney : UdonSharpBehaviour
             m_objects[i].transform.rotation = rotation;
 		}
 
-        m_phase += Time.deltaTime * m_speedScaler;
+        m_phase += Time.deltaTime * m_speedScaler * (k_maxNumberOfObjects / m_numberOfObjects) ;
 	}
 
 #region Slider Functions
@@ -182,6 +185,11 @@ public class Whitney : UdonSharpBehaviour
     public void OnColorAlphaSliderChanged()
 	{
         m_colorAlpha = m_colorAlphaSlider.value;
+	}
+
+    public void OnColorHueSpeedSliderChanged()
+	{
+        m_colorHueSpeed = m_colorHueSpeedSlider.value;
 	}
 #endregion
 
