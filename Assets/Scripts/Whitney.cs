@@ -18,9 +18,10 @@ public class Whitney : UdonSharpBehaviour
     [SerializeField] [Range(1, 100)] protected int m_numberOfObjects = 50;  // magic number alert! make sure Range(max) matches k_maxNumberOfObjects
     [SerializeField] protected float m_circleSize = 1.0f;
     [SerializeField] [Range(0.001f, 0.1f)] protected float m_speedScaler = 0.01f;
+    [SerializeField] protected bool m_3dMode = false;
+    [SerializeField] [Range(0.01f, 1f)] protected float m_tubeSpacing = 1.0f;
 
     [Header("Scale")]
-    [SerializeField] protected bool m_doHarmonicScaling = false;
     [SerializeField] [Range(0.001f, 1f)] protected float m_globalScale = 0.25f;
     [SerializeField] [Range(0.1f, 1f)] protected float m_baseScaleX = 1.0f;
     [SerializeField] [Range(0.1f, 1f)] protected float m_baseScaleY = 1.0f;
@@ -59,14 +60,15 @@ public class Whitney : UdonSharpBehaviour
     [SerializeField] protected Slider m_rotationOffsetYSlider;
     [SerializeField] protected Slider m_rotationOffsetZSlider;
 
-    [SerializeField] protected Toggle m_harmonicScaleToggle;
     [SerializeField] protected Toggle m_rotateXToggle;
     [SerializeField] protected Toggle m_rotateYToggle;
     [SerializeField] protected Toggle m_rotateZToggle;
 
+    [SerializeField] protected Toggle m_3dModeToggle;
 
     protected GameObject[] m_objects;
     protected float m_phase = 0.0f;
+
 
     void Start()
     {
@@ -76,8 +78,9 @@ public class Whitney : UdonSharpBehaviour
             m_objects[i] = VRCInstantiate(m_objectPrefab);
             m_objects[i].transform.SetParent(this.transform);
             m_objects[i].SetActive(false);
-            m_objects[i].GetComponent<Renderer>().sortingOrder = i;
         }
+
+        On3dModeToggleChanged();
 
         m_circleSizeSlider.value = m_circleSize;
         m_speedScalerSlider.value = m_speedScaler;
@@ -100,6 +103,8 @@ public class Whitney : UdonSharpBehaviour
         m_colorSaturationSlider.value = m_colorSaturation;
         m_colorBrightnessSlider.value = m_colorBrightness;
         m_colorAlphaSlider.value = m_colorAlpha;
+
+        m_3dModeToggle.isOn = m_3dMode;
     }
   
 	private void Update()
@@ -119,7 +124,12 @@ public class Whitney : UdonSharpBehaviour
             float scaledPhase = m_phase * (i + 1);  // add 1 so there arent any objects that arent moving
 
             // position
-            m_objects[i].transform.position  = new Vector3(Mathf.Cos(scaledPhase) * m_circleSize, Mathf.Sin(scaledPhase) * m_circleSize, 0.0f) + this.transform.position;
+            Vector3 position  = new Vector3(Mathf.Cos(scaledPhase) * m_circleSize, Mathf.Sin(scaledPhase) * m_circleSize, 0.0f) + this.transform.position;
+            if(m_3dMode)
+			{
+                position.z += m_tubeSpacing * i;
+			}
+            m_objects[i].transform.position = position;
 
             // color
             Color color = Color.HSVToRGB(scaledPhase * m_colorHueSpeed % 1.0f, m_colorSaturation, m_colorBrightness);
@@ -127,14 +137,14 @@ public class Whitney : UdonSharpBehaviour
             m_objects[i].GetComponent<Renderer>().material.color = color;
 
             // scale
-            if(m_doHarmonicScaling)
+            if(m_3dMode)
 			{
-                const float harmonicScalingOffset = 0.02f;
-                m_objects[i].transform.localScale = baseScale * i * harmonicScalingOffset;
+                m_objects[i].transform.localScale = baseScale;
 			}
             else
 			{
-                m_objects[i].transform.localScale = baseScale;
+                const float harmonicScalingOffset = 0.02f;
+                m_objects[i].transform.localScale = baseScale * i * harmonicScalingOffset;
 			}
 
             // rotation (probably dont need to modulo)
@@ -220,11 +230,6 @@ public class Whitney : UdonSharpBehaviour
 #endregion
 
 #region Toggle Functions
-	public void OnHarmonicScaleToggleChanged()
-	{
-        m_doHarmonicScaling = m_harmonicScaleToggle.isOn;
-	}
-
 	public void OnRotateXToggleChanged()
 	{
         m_rotateX = m_rotateXToggle.isOn;
@@ -238,6 +243,16 @@ public class Whitney : UdonSharpBehaviour
     public void OnRotateZToggleChanged()
 	{
         m_rotateZ = m_rotateZToggle.isOn;
+	}
+
+    public void On3dModeToggleChanged()
+	{
+        m_3dMode = m_3dModeToggle.isOn;
+
+        for(int i = 0; i < m_objects.Length; i++)
+        {
+            m_objects[i].GetComponent<Renderer>().sortingOrder = m_3dMode ? 0 : (m_objects.Length - 1 - i);
+        }
 	}
 #endregion
 
