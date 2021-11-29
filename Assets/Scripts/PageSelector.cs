@@ -29,7 +29,6 @@ public class PageSelector : UdonSharpBehaviour
 
     public void ShowPage(int _pageIndex)
 	{
-        Debug.Log("show page: " + _pageIndex);
         for(int i = 0; i < m_pages.Length; i++)
 		{
             bool showThisPage = _pageIndex == i;
