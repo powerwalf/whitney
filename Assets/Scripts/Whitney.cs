@@ -45,6 +45,7 @@ public class Whitney : UdonSharpBehaviour
     [SerializeField] protected Slider m_numberOfObjectsSlider;
     [SerializeField] protected Slider m_circleSizeSlider;
     [SerializeField] protected Slider m_speedScalerSlider;
+    [SerializeField] protected Slider m_tubeLengthSlider;
 
     [SerializeField] protected Slider m_globalScaleSlider;
     [SerializeField] protected Slider m_xScaleSlider;
@@ -80,8 +81,6 @@ public class Whitney : UdonSharpBehaviour
             m_objects[i].SetActive(false);
         }
 
-        On3dModeToggleChanged();
-
         m_circleSizeSlider.value = m_circleSize;
         m_speedScalerSlider.value = m_speedScaler;
         m_numberOfObjectsSlider.value = m_numberOfObjects;
@@ -105,6 +104,8 @@ public class Whitney : UdonSharpBehaviour
         m_colorAlphaSlider.value = m_colorAlpha;
 
         m_3dModeToggle.isOn = m_3dMode;
+        On3dModeToggleChanged();
+        m_tubeLengthSlider.value = m_tubeSpacing;
     }
   
 	private void Update()
@@ -227,10 +228,14 @@ public class Whitney : UdonSharpBehaviour
 	{
         m_rotationZ = m_rotationOffsetZSlider.value;
 	}        
+    public void OnTubeLengthSliderChanged()
+	{
+        m_tubeSpacing = m_tubeLengthSlider.value;
+	}
 #endregion
 
 #region Toggle Functions
-	public void OnRotateXToggleChanged()
+    public void OnRotateXToggleChanged()
 	{
         m_rotateX = m_rotateXToggle.isOn;
 	}
