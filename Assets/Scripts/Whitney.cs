@@ -32,6 +32,8 @@ public class Whitney : UdonSharpBehaviour
     [SerializeField] [Range(0f, 1f)] protected float m_colorSaturation = 0.7f;
     [SerializeField] [Range(0f, 1f)] protected float m_colorBrightness = 0.7f;
     [SerializeField] [Range(0f, 1f)] protected float m_colorAlpha = 0.7f;
+    [SerializeField] [Range(0f, 1f)] protected float m_metallic = 0.7f;
+    [SerializeField] [Range(0f, 1f)] protected float m_smoothness = 0.7f;
 
     [Header("Rotation")]
     [SerializeField] protected bool m_rotateX = false;
@@ -68,17 +70,20 @@ public class Whitney : UdonSharpBehaviour
     [SerializeField] protected Toggle m_3dModeToggle;
 
     protected GameObject[] m_objects;
+    protected Renderer[] m_objectRenderers;
     protected float m_phase = 0.0f;
 
 
     void Start()
     {
         m_objects = new GameObject[k_maxNumberOfObjects];
+        m_objectRenderers = new Renderer[k_maxNumberOfObjects];
         for(int i = 0; i < m_objects.Length; i++)
         {
             m_objects[i] = VRCInstantiate(m_objectPrefab);
             m_objects[i].transform.SetParent(this.transform);
             m_objects[i].SetActive(false);
+            m_objectRenderers[i] = m_objects[i].GetComponent<Renderer>();
         }
 
         m_circleSizeSlider.value = m_circleSize;
@@ -135,7 +140,10 @@ public class Whitney : UdonSharpBehaviour
             // color
             Color color = Color.HSVToRGB(scaledPhase * m_colorHueSpeed % 1.0f, m_colorSaturation, m_colorBrightness);
             color.a = m_colorAlpha;
-            m_objects[i].GetComponent<Renderer>().material.color = color;
+            m_objectRenderers[i].material.color = color;
+            m_objectRenderers[i].material.SetFloat("_Metallic", m_metallic);
+            m_objectRenderers[i].material.SetFloat("_Smoothness", m_smoothness);
+            //m_objects[i].GetComponent<Renderer>().material.SetColor("_EmissionColor",color);
 
             // scale
             if(m_3dMode)
@@ -254,9 +262,9 @@ public class Whitney : UdonSharpBehaviour
 	{
         m_3dMode = m_3dModeToggle.isOn;
 
-        for(int i = 0; i < m_objects.Length; i++)
+        for(int i = 0; i < m_objectRenderers.Length; i++)
         {
-            m_objects[i].GetComponent<Renderer>().sortingOrder = m_3dMode ? 0 : (m_objects.Length - 1 - i);
+            m_objectRenderers[i].sortingOrder = m_3dMode ? 0 : (m_objectRenderers.Length - 1 - i);
         }
 	}
 #endregion
