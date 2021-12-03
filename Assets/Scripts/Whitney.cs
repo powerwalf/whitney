@@ -7,41 +7,116 @@ using VRC.Udon;
 
 // if you see a magic number 100, its the max number of objects
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class Whitney : UdonSharpBehaviour
 {
     protected const int k_maxNumberOfObjects = 100;  // magic number alert! make sure to update m_numberOfObjects Range(max)
 
     [Header("Prefab")]
+
     [SerializeField] protected GameObject m_objectPrefab;
 
     [Header("Whitney")]
-    [SerializeField] [Range(1, 100)] protected int m_numberOfObjects = 50;  // magic number alert! make sure Range(max) matches k_maxNumberOfObjects
-    [SerializeField] protected float m_circleSize = 1.0f;
-    [SerializeField] [Range(0.001f, 0.1f)] protected float m_speedScaler = 0.01f;
-    [SerializeField] protected bool m_3dMode = false;
-    [SerializeField] [Range(0.01f, 1f)] protected float m_tubeSpacing = 1.0f;
+
+    [SerializeField] [Range(1, 100)]  // magic number alert! make sure Range(max) matches k_maxNumberOfObjects
+    [UdonSynced, FieldChangeCallback(nameof(NumberOfObjects))] 
+    protected int m_numberOfObjects = 50;  
+    protected int NumberOfObjects { set { m_numberOfObjects = value; RequestSerialization(); } }
+
+    [SerializeField] [Range(0.5f, 2.0f)] 
+    [UdonSynced, FieldChangeCallback(nameof(CircleSize))] 
+    protected float m_circleSize = 1.0f;
+    protected float CircleSize { set { m_circleSize = value; RequestSerialization(); } }
+
+    [SerializeField] [Range(0.001f, 0.1f)]
+    [UdonSynced, FieldChangeCallback(nameof(SpeedScalar))] 
+    protected float m_speedScaler = 0.01f;
+    protected float SpeedScalar { set { m_speedScaler = value; RequestSerialization(); } }
+
+    [SerializeField] 
+    [UdonSynced, FieldChangeCallback(nameof(Is3dMode))] 
+    protected bool m_3dMode = false;
+    protected bool Is3dMode { set { m_3dMode = value; RequestSerialization(); } }
+
+    [SerializeField] [Range(0.01f, 1f)]
+    [UdonSynced, FieldChangeCallback(nameof(TubeSpacing))] 
+    protected float m_tubeSpacing = 1.0f;
+    protected float TubeSpacing { set { m_tubeSpacing = value; RequestSerialization(); } }
 
     [Header("Scale")]
-    [SerializeField] [Range(0.001f, 1f)] protected float m_globalScale = 0.25f;
-    [SerializeField] [Range(0.1f, 1f)] protected float m_baseScaleX = 1.0f;
-    [SerializeField] [Range(0.1f, 1f)] protected float m_baseScaleY = 1.0f;
-    [SerializeField] [Range(0.1f, 1f)] protected float m_baseScaleZ = 1.0f;
+
+    [SerializeField] [Range(0.001f, 1f)]
+    [UdonSynced, FieldChangeCallback(nameof(GlobalScale))] 
+    protected float m_globalScale = 0.25f;
+    protected float GlobalScale { set { m_globalScale = value; RequestSerialization(); } }
+
+    [SerializeField] [Range(0.1f, 1f)]
+    [UdonSynced, FieldChangeCallback(nameof(BaseScaleX))] 
+    protected float m_baseScaleX = 1.0f;
+    protected float BaseScaleX { set { m_baseScaleX = value; RequestSerialization(); } }
+
+    [UdonSynced, FieldChangeCallback(nameof(BaseScaleY))] 
+    [SerializeField] [Range(0.1f, 1f)]
+    protected float m_baseScaleY = 1.0f;
+    protected float BaseScaleY { set { m_baseScaleY = value; RequestSerialization(); } }
+
+    [UdonSynced, FieldChangeCallback(nameof(BaseScaleZ))] 
+    [SerializeField] [Range(0.1f, 1f)]
+    protected float m_baseScaleZ = 1.0f;
+    protected float BaseScaleZ { set { m_baseScaleZ = value; RequestSerialization(); } }
 
     [Header("Color")]
-    [SerializeField] [Range(0.001f, 1f)] protected float m_colorHueSpeed = 1f;
-    [SerializeField] [Range(0f, 1f)] protected float m_colorSaturation = 0.7f;
-    [SerializeField] [Range(0f, 1f)] protected float m_colorBrightness = 0.7f;
-    [SerializeField] [Range(0f, 1f)] protected float m_colorAlpha = 0.7f;
-    [SerializeField] [Range(0f, 1f)] protected float m_metallic = 0.7f;
-    [SerializeField] [Range(0f, 1f)] protected float m_smoothness = 0.7f;
+
+    [SerializeField] [Range(0.001f, 1f)]
+    [UdonSynced, FieldChangeCallback(nameof(ColorHueSpeed))] 
+    protected float m_colorHueSpeed = 1f;
+    protected float ColorHueSpeed { set { m_colorHueSpeed = value; RequestSerialization(); } }
+
+    [SerializeField] [Range(0f, 1f)]
+    [UdonSynced, FieldChangeCallback(nameof(ColorSaturation))] 
+    protected float m_colorSaturation = 1f;
+    protected float ColorSaturation { set { m_colorSaturation = value; RequestSerialization(); } }
+
+    [SerializeField] [Range(0f, 1f)]
+    [UdonSynced, FieldChangeCallback(nameof(ColorBrightness))] 
+    protected float m_colorBrightness = 1f;
+    protected float ColorBrightness { set { m_colorBrightness = value; RequestSerialization(); } }
+
+    [SerializeField] [Range(0f, 1f)]
+    [UdonSynced, FieldChangeCallback(nameof(ColorAlpha))] 
+    protected float m_colorAlpha = 0.75f;
+    protected float ColorAlpha { set { m_colorAlpha = value; RequestSerialization(); } }
+    //[SerializeField] [Range(0f, 1f)] protected float m_metallic = 0.7f;
+    //[SerializeField] [Range(0f, 1f)] protected float m_smoothness = 0.7f;
 
     [Header("Rotation")]
-    [SerializeField] protected bool m_rotateX = false;
-    [SerializeField] protected bool m_rotateY = false;
-    [SerializeField] protected bool m_rotateZ = false;
-    [SerializeField] [Range(0f, 360f)] protected float m_rotationX = 0.0f;
-    [SerializeField] [Range(0f, 360f)] protected float m_rotationY = 0.0f;
-    [SerializeField] [Range(0f, 360f)] protected float m_rotationZ = 0.0f;
+
+    [SerializeField] [UdonSynced, FieldChangeCallback(nameof(RotateX))] 
+    protected bool m_rotateX = false;
+    protected bool RotateX { set { m_rotateX = value; RequestSerialization(); } }
+
+    [SerializeField] [UdonSynced, FieldChangeCallback(nameof(RotateY))] 
+    protected bool m_rotateY = false;
+    protected bool RotateY { set { m_rotateY = value; RequestSerialization(); } }
+
+    [SerializeField] [UdonSynced, FieldChangeCallback(nameof(RotateZ))] 
+    protected bool m_rotateZ = false;
+    protected bool RotateZ { set { m_rotateZ = value; RequestSerialization(); } }
+
+    [UdonSynced, FieldChangeCallback(nameof(RotationX))] 
+    [SerializeField] [Range(0f, 360f)]
+    protected float m_rotationX = 0.0f;
+    protected float RotationX { set { m_rotationX = value; RequestSerialization(); } }
+
+    [UdonSynced, FieldChangeCallback(nameof(RotationY))] 
+    [SerializeField] [Range(0f, 360f)]
+    protected float m_rotationY = 0.0f;
+    protected float RotationY { set { m_rotationY = value; RequestSerialization(); } }
+
+    [UdonSynced, FieldChangeCallback(nameof(RotationZ))] 
+    [SerializeField] [Range(0f, 360f)]
+    protected float m_rotationZ = 0.0f;
+    protected float RotationZ { set { m_rotationZ = value; RequestSerialization(); } }
 
     [Header("UI Control Refs")]
     [SerializeField] protected Slider m_numberOfObjectsSlider;
@@ -71,7 +146,12 @@ public class Whitney : UdonSharpBehaviour
 
     protected GameObject[] m_objects;
     protected Renderer[] m_objectRenderers;
+
+    [UdonSynced, FieldChangeCallback(nameof(Phase))]
     protected float m_phase = 0.0f;
+    protected float Phase { set { m_phase = value; RequestSerialization(); } }
+    protected float m_timeSinceLastPhaseSync = 0f;
+    protected const float k_timeBetweenPhaseSyncs = 10.0f;
 
 
     void Start()
@@ -141,8 +221,8 @@ public class Whitney : UdonSharpBehaviour
             Color color = Color.HSVToRGB(scaledPhase * m_colorHueSpeed % 1.0f, m_colorSaturation, m_colorBrightness);
             color.a = m_colorAlpha;
             m_objectRenderers[i].material.color = color;
-            m_objectRenderers[i].material.SetFloat("_Metallic", m_metallic);
-            m_objectRenderers[i].material.SetFloat("_Smoothness", m_smoothness);
+            //m_objectRenderers[i].material.SetFloat("_Metallic", m_metallic);
+            //m_objectRenderers[i].material.SetFloat("_Smoothness", m_smoothness);
             //m_objects[i].GetComponent<Renderer>().material.SetColor("_EmissionColor",color);
 
             // scale
@@ -164,104 +244,112 @@ public class Whitney : UdonSharpBehaviour
 		}
 
         m_phase += Time.deltaTime * m_speedScaler * (k_maxNumberOfObjects / m_numberOfObjects) ;
+
+        m_timeSinceLastPhaseSync += Time.deltaTime;
+        if(m_timeSinceLastPhaseSync > k_timeBetweenPhaseSyncs)
+		{
+            m_timeSinceLastPhaseSync = 0f;
+            Phase = m_phase;
+		}            
 	}
 
 #region Slider Functions
 	public void OnNumberOfObjectsSliderChanged()
 	{
-        m_numberOfObjects = Mathf.RoundToInt(m_numberOfObjectsSlider.value);
+        NumberOfObjects = Mathf.RoundToInt(m_numberOfObjectsSlider.value);
 	}
 
     public void OnCircleSizeSliderChanged()
 	{
-        m_circleSize = m_circleSizeSlider.value;
+        CircleSize = m_circleSizeSlider.value;
 	}
 
     public void OnSpeedScalarSliderChanged()
 	{
-        m_speedScaler = m_speedScalerSlider.value;
+        SpeedScalar = m_speedScalerSlider.value;
 	}
 
     public void OnGlobalScaleSliderChanged()
 	{
-        m_globalScale = m_globalScaleSlider.value;
+        GlobalScale = m_globalScaleSlider.value;
 	}
 
     public void OnScaleXSliderChanged()
 	{
-        m_baseScaleX = m_xScaleSlider.value;
+        BaseScaleX = m_xScaleSlider.value;
 	}
 
     public void OnScaleYSliderChanged()
 	{
-        m_baseScaleY = m_yScaleSlider.value;
+        BaseScaleY = m_yScaleSlider.value;
 	}
 
     public void OnScaleZSliderChanged()
 	{
-        m_baseScaleZ = m_zScaleSlider.value;
+        BaseScaleZ = m_zScaleSlider.value;
 	}
 
     public void OnColorSaturationSliderChanged()
 	{
-        m_colorSaturation = m_colorSaturationSlider.value;
+        ColorSaturation = m_colorSaturationSlider.value;
 	}
 
     public void OnColorBrightnessSliderChanged()
 	{
-        m_colorBrightness = m_colorBrightnessSlider.value;
+        ColorBrightness = m_colorBrightnessSlider.value;
 	}
 
     public void OnColorAlphaSliderChanged()
 	{
-        m_colorAlpha = m_colorAlphaSlider.value;
+        ColorAlpha = m_colorAlphaSlider.value;
 	}
 
     public void OnColorHueSpeedSliderChanged()
 	{
-        m_colorHueSpeed = m_colorHueSpeedSlider.value;
+        ColorHueSpeed = m_colorHueSpeedSlider.value;
 	}
 
     public void OnRotationOffsetXSliderChanged()
 	{
-        m_rotationX = m_rotationOffsetXSlider.value;
+        RotationX = m_rotationOffsetXSlider.value;
 	}        
 
     public void OnRotationOffsetYSliderChanged()
 	{
-        m_rotationY = m_rotationOffsetYSlider.value;
+        RotationY = m_rotationOffsetYSlider.value;
 	}        
 
     public void OnRotationOffsetZSliderChanged()
 	{
-        m_rotationZ = m_rotationOffsetZSlider.value;
+        RotationZ = m_rotationOffsetZSlider.value;
 	}        
     public void OnTubeLengthSliderChanged()
 	{
-        m_tubeSpacing = m_tubeLengthSlider.value;
+        TubeSpacing = m_tubeLengthSlider.value;
 	}
 #endregion
 
 #region Toggle Functions
     public void OnRotateXToggleChanged()
 	{
-        m_rotateX = m_rotateXToggle.isOn;
+        RotateX = m_rotateXToggle.isOn;
 	}
 
     public void OnRotateYToggleChanged()
 	{
-        m_rotateY = m_rotateYToggle.isOn;
+        RotateY = m_rotateYToggle.isOn;
 	}
 
     public void OnRotateZToggleChanged()
 	{
-        m_rotateZ = m_rotateZToggle.isOn;
+        RotateZ = m_rotateZToggle.isOn;
 	}
 
     public void On3dModeToggleChanged()
 	{
-        m_3dMode = m_3dModeToggle.isOn;
+        Is3dMode = m_3dModeToggle.isOn;
 
+        // TODO: move this to Update() so it doesnt get skipped on client sync
         for(int i = 0; i < m_objectRenderers.Length; i++)
         {
             m_objectRenderers[i].sortingOrder = m_3dMode ? 0 : (m_objectRenderers.Length - 1 - i);
