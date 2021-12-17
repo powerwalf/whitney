@@ -146,6 +146,7 @@ public class Whitney : UdonSharpBehaviour
 
     protected GameObject[] m_objects;
     protected Renderer[] m_objectRenderers;
+    protected Light[] m_lights;
 
     [UdonSynced, FieldChangeCallback(nameof(Phase))]
     protected float m_phase = 0.0f;
@@ -158,12 +159,14 @@ public class Whitney : UdonSharpBehaviour
     {
         m_objects = new GameObject[k_maxNumberOfObjects];
         m_objectRenderers = new Renderer[k_maxNumberOfObjects];
+        m_lights = new Light[k_maxNumberOfObjects];
         for(int i = 0; i < m_objects.Length; i++)
         {
             m_objects[i] = VRCInstantiate(m_objectPrefab);
             m_objects[i].transform.SetParent(this.transform);
             m_objects[i].SetActive(false);
             m_objectRenderers[i] = m_objects[i].GetComponent<Renderer>();
+            m_lights[i] = m_objects[i].GetComponent<Light>();
         }
 
         m_circleSizeSlider.value = m_circleSize;
@@ -221,6 +224,7 @@ public class Whitney : UdonSharpBehaviour
             Color color = Color.HSVToRGB(scaledPhase * m_colorHueSpeed % 1.0f, m_colorSaturation, m_colorBrightness);
             color.a = m_colorAlpha;
             m_objectRenderers[i].material.color = color;
+            m_lights[i].color = color;
             //m_objectRenderers[i].material.SetFloat("_Metallic", m_metallic);
             //m_objectRenderers[i].material.SetFloat("_Smoothness", m_smoothness);
             //m_objects[i].GetComponent<Renderer>().material.SetColor("_EmissionColor",color);
