@@ -1,10 +1,6 @@
-﻿
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using VRC.SDKBase;
-using VRC.Udon;
 
 //[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class NetworkTesting : UdonSharpBehaviour

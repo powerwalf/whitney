@@ -1,7 +1,6 @@
 ﻿using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
-using VRC.Udon;
 using UnityEngine.UI;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
@@ -16,8 +15,14 @@ public class SliderWithLabel : UdonSharpBehaviour
     [UdonSynced, FieldChangeCallback(nameof(SyncedSliderValue))] 
     [SerializeField] [Range(0f, 360f)]
     protected float m_syncedSliderValue = 0.0f;
-    protected float SyncedSliderValue { set { m_syncedSliderValue = value; RequestSerialization(); } }
-
+    protected float SyncedSliderValue
+    {
+        set
+        {
+            m_syncedSliderValue = value;
+            RequestSerialization();
+        }
+    }
 
 	// called by UI.Slider.OnValueChanged 
 	public void OnSliderValueChanged()

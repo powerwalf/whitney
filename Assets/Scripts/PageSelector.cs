@@ -1,10 +1,6 @@
-﻿
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
-using VRC.Udon;
-using UnityEngine.UI;
-using VRC.Udon.Common;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class PageSelector : UdonSharpBehaviour
@@ -17,6 +13,7 @@ public class PageSelector : UdonSharpBehaviour
     {
         set
         {
+            BecomeOwnerIfNotAlready();
             m_pageIndex = value;
             RequestSerialization();
             UpdatePageVisual();
@@ -40,7 +37,7 @@ public class PageSelector : UdonSharpBehaviour
 
     public void ShowPage(int _pageIndex)
 	{
-        BecomeOwnerIfNotAlready();
+        //BecomeOwnerIfNotAlready();
         PageIndex = _pageIndex;
 	}
 
