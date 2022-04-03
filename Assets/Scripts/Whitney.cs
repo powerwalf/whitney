@@ -260,75 +260,90 @@ public class Whitney : UdonSharpBehaviour
 #region Slider Functions
 	public void OnNumberOfObjectsSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         NumberOfObjects = Mathf.RoundToInt(m_numberOfObjectsSlider.value);
 	}
 
     public void OnCircleSizeSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         CircleSize = m_circleSizeSlider.value;
 	}
 
     public void OnSpeedScalarSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         SpeedScalar = m_speedScalerSlider.value;
 	}
 
     public void OnGlobalScaleSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         GlobalScale = m_globalScaleSlider.value;
 	}
 
     public void OnScaleXSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         BaseScaleX = m_xScaleSlider.value;
 	}
 
     public void OnScaleYSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         BaseScaleY = m_yScaleSlider.value;
 	}
 
     public void OnScaleZSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         BaseScaleZ = m_zScaleSlider.value;
 	}
 
     public void OnColorSaturationSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         ColorSaturation = m_colorSaturationSlider.value;
 	}
 
     public void OnColorBrightnessSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         ColorBrightness = m_colorBrightnessSlider.value;
 	}
 
     public void OnColorAlphaSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         ColorAlpha = m_colorAlphaSlider.value;
 	}
 
     public void OnColorHueSpeedSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         ColorHueSpeed = m_colorHueSpeedSlider.value;
 	}
 
     public void OnRotationOffsetXSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         RotationX = m_rotationOffsetXSlider.value;
 	}        
 
     public void OnRotationOffsetYSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         RotationY = m_rotationOffsetYSlider.value;
 	}        
 
     public void OnRotationOffsetZSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         RotationZ = m_rotationOffsetZSlider.value;
 	}        
     public void OnTubeLengthSliderChanged()
 	{
+        BecomeOwnerIfNotAlready();
         TubeSpacing = m_tubeLengthSlider.value;
 	}
 #endregion
@@ -336,21 +351,25 @@ public class Whitney : UdonSharpBehaviour
 #region Toggle Functions
     public void OnRotateXToggleChanged()
 	{
+        BecomeOwnerIfNotAlready();
         RotateX = m_rotateXToggle.isOn;
 	}
 
     public void OnRotateYToggleChanged()
 	{
+        BecomeOwnerIfNotAlready();
         RotateY = m_rotateYToggle.isOn;
 	}
 
     public void OnRotateZToggleChanged()
 	{
+        BecomeOwnerIfNotAlready();
         RotateZ = m_rotateZToggle.isOn;
 	}
 
     public void On3dModeToggleChanged()
 	{
+        BecomeOwnerIfNotAlready();
         Is3dMode = m_3dModeToggle.isOn;
 
         // TODO: move this to Update() so it doesnt get skipped on client sync
@@ -360,6 +379,14 @@ public class Whitney : UdonSharpBehaviour
         }
 	}
 #endregion
+
+    public void BecomeOwnerIfNotAlready()
+    {
+        if(!Networking.IsOwner(Networking.LocalPlayer, this.gameObject))
+		{
+            Networking.SetOwner(Networking.LocalPlayer, this.gameObject);
+		}
+    }
 
 }
 
